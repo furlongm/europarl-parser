@@ -22,7 +22,10 @@
 # $ wget http://www.statmt.org/europarl/v6/europarl.tgz
 # $ tar xf europarl.tgz
 # $ cd europarl/txt/en
-# $ ../../../europarl_txt2xml.sh all
+# $ ../../../europarl-parser.sh -p
+# $ ../../../europarl-parser.sh -c -a
+#  or
+# $ ../../../europarl-parser.sh -c -f ep-2010-07-07.txt
 #
 # Processed files will end up in europarl/txt/en/processed
 #
@@ -86,18 +89,32 @@ indent_file=indent.xsl
 tmp_dir=/tmp
 
 function usage() {
-  echo "Convert Europarl Parallel Corpus txt files to ep.dtd-compliant xml"
+  echo
+  echo "This script converts Europarl Parallel Corpus txt files to ep.dtd-compliant xml"
   echo "See comments in script for futher information."
   echo
   echo "Usage:"
-  echo "$0 FILE (converts a single file to ecpc_EP xml)"
-  echo "$0 all (converts all files in current directory)"
+  echo "$0 -p         (preprocess files, required for europarl v6)"
+  echo "$0 -c -f FILE (converts a single file to ecpc_EP xml)"
+  echo "$0 -c -a      (converts all files in current directory)"
   echo
-  echo "N.B. This script requires libxslt installed on your system with the str:replace"
+  echo "N.B. 1"
+  echo "Preprocessing files takes some time, but will significantly increase the number"
+  echo "of files processed. Only files of the format ep-yy-mm-dd.txt will be processed,"
+  echo "and in later years, these files have been split out into a number of smaller"
+  echo "files which will not be converted unless preprocessing is run before conversion."
+  echo
+  echo "N.B. 2"
+  echo "This script should be run in the language directory of the corpus."
+  echo "E.g. europarl/txt/en for english."
+  echo
+  echo "N.B. 3"
+  echo "This script requires libxslt installed on your system with the str:replace"
   echo "extension. Try"
   echo " \$ 'xsltproc --dumpextensions | grep replace'"
   echo "to check if it is installed. libxml is also required to check the validity of"
   echo "the resultant xml files."
+  echo 
   exit 0
 }
 
@@ -125,7 +142,7 @@ function output_dtd() {
 <!ELEMENT ecpc_EP (header,body,back)>
 <!ELEMENT header (title|index|omit)*>
 <!ATTLIST header filename CDATA #REQUIRED>
-<!ATTLIST header language (CS|DA|DE|EL|EN|ES|ET|FI|FR|HU|IT|LT|LV|MT|NL|PL|PT|SK|SL|SV) #REQUIRED>
+<!ATTLIST header language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV) #REQUIRED>
 <!ELEMENT title (#PCDATA)>
 <!-- indexitem tags different items within the index. These will be repeated later on throughout the text as header to separate different items in the session -->
 <!ELEMENT index (#PCDATA|label|date|place|edition|indexitem)*>
@@ -150,17 +167,17 @@ function output_dtd() {
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT affiliation EMPTY>
 <!ATTLIST affiliation
-EPparty (PPE-DE|PSE|ALDE|Verts-ALE|GUE-NGL|IND-DEM|UEN|NI|ELDR|EDD|EPP-ED|PPE|UPE|TDI|I-EDN|ARE|UNKNOWN) "UNKNOWN"
+EPparty (PPE-DE|PSE|ALDE|Verts-ALE|GUE-NGL|IND-DEM|UEN|NI|ELDR|EDD|EPP-ED|PPE|UPE|TDI|I-EDN|ARE|EFD|ITS|ECR|S-D|UNKNOWN) "UNKNOWN"
 national_party CDATA #IMPLIED>
 <!ELEMENT post (#PCDATA)>
 <!ELEMENT speech (#PCDATA|omit|italics)*>
-<!ATTLIST speech language (CS|DA|DE|EL|EN|ES|ET|FI|FR|HU|IT|LT|LV|MT|NL|PL|PT|SK|SL|SV|UNKNOWN)
+<!ATTLIST speech language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV|UNKNOWN)
 "UNKNOWN">
 <!ATTLIST speech ref ID #REQUIRED>
 <!ELEMENT writer (name*,affiliation?,post?)>
 <!ELEMENT writing (#PCDATA|omit|italics)*>
 <!ATTLIST writing ref ID #REQUIRED>
-<!ATTLIST writing language (CS|DA|DE|EL|EN|ES|ET|FI|FR|HU|IT|LT|LV|MT|NL|PL|PT|SK|SL|SV|UNKNOWN)
+<!ATTLIST writing language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV|UNKNOWN)
 "UNKNOWN">
 <!ELEMENT italics (#PCDATA)>
 <!ELEMENT heading (#PCDATA)>
@@ -226,11 +243,18 @@ function output_xslt() {
 <xsl:text>
 </xsl:text>
         <affiliation>
-          <xsl:if test="contains(@NAME,'(')">
-            <xsl:attribute name="EPparty">
-              <xsl:value-of select="normalize-space(str:replace(substring-before(substring-after(@NAME,'('),')'),'/','-'))" />
-            </xsl:attribute>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when test="contains(@NAME,'(')">
+              <xsl:attribute name="EPparty">
+                <xsl:value-of select="normalize-space(str:replace(substring-before(substring-after(@NAME,'('),')'),'/','-'))" />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="EPparty">
+                <xsl:value-of select="normalize-space(str:replace(@AFFILIATION,'/','-'))" />
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         </affiliation>
 <xsl:text>
 </xsl:text>
@@ -274,11 +298,18 @@ function output_xslt() {
 <xsl:text>
 </xsl:text>
         <affiliation>
-          <xsl:if test="contains(@NAME,'(')">
-            <xsl:attribute name="EPparty">
-              <xsl:value-of select="normalize-space(str:replace(substring-before(substring-after(@NAME,'('),')'),'/','-'))" />
-            </xsl:attribute>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when test="contains(@NAME,'(')">
+              <xsl:attribute name="EPparty">
+                <xsl:value-of select="normalize-space(str:replace(substring-before(substring-after(@NAME,'('),')'),'/','-'))" />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="EPparty">
+                <xsl:value-of select="normalize-space(str:replace(@AFFILIATION,'/','-'))" />
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         </affiliation>
 <xsl:text>
 </xsl:text>
@@ -321,14 +352,50 @@ function output_indent() {
   if [ ! -e ${indent_file} ] ; then
     cat > ${indent_file} << EOF
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output method="xml"
-    doctype-system="ep.dtd"
-    indent="yes"
-    encoding="UTF-8" />
-<xsl:strip-space elements="*"/>
-<xsl:template match="/">
-  <xsl:copy-of select="."/>
-</xsl:template>
+  <xsl:output method="xml" encoding="UTF-8"/>
+  <xsl:param name="indent-increment" select="'   '"/>
+  
+  <xsl:template name="newline">
+    <xsl:text disable-output-escaping="yes">
+</xsl:text>
+  </xsl:template>
+  
+  <xsl:template match="comment() | processing-instruction()">
+    <xsl:param name="indent" select="''"/>
+    <xsl:call-template name="newline"/>    
+    <xsl:value-of select="\$indent"/>
+    <xsl:copy />
+  </xsl:template>
+  
+  <xsl:template match="text()">
+    <xsl:param name="indent" select="''"/>
+    <xsl:call-template name="newline"/>    
+    <xsl:value-of select="\$indent"/>
+    <xsl:value-of select="normalize-space(.)"/>
+  </xsl:template>
+    
+  <xsl:template match="text()[normalize-space(.)='']"/>
+  
+  <xsl:template match="*">
+    <xsl:param name="indent" select="''"/>
+    <xsl:call-template name="newline"/>    
+    <xsl:value-of select="\$indent"/>
+      <xsl:choose>
+       <xsl:when test="count(child::*) > 0">
+        <xsl:copy>
+         <xsl:copy-of select="@*"/>
+         <xsl:apply-templates select="*|text()">
+           <xsl:with-param name="indent" select="concat (\$indent, \$indent-increment)"/>
+         </xsl:apply-templates>
+         <xsl:call-template name="newline"/>
+         <xsl:value-of select="\$indent"/>
+        </xsl:copy>
+       </xsl:when>       
+       <xsl:otherwise>
+        <xsl:copy-of select="."/>
+       </xsl:otherwise>
+     </xsl:choose>
+  </xsl:template>    
 </xsl:stylesheet>
 EOF
   fi
@@ -345,11 +412,22 @@ function find_new_lang() {
     fi
     cp ${alt_lang_file} ${tmp_file}.altlang
     sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}.altlang
+
+    # add alternate style (FR) languages in the text into the LANGUAGE attribute
+    sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}.altlang
+    sed -i -e 's/> \?/>\n/g' ${tmp_file}.altlang
+
+    # switch NAME and LANGUAGE attributes for newer files
+    sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}.altlang
+
+    # remove duplicate languages (the one in brackets is usually correct)
+    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}.altlang
+    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}.altlang
     sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}.altlang
     new_lang=`grep "${first_segment}" ${tmp_file}.altlang | cut -f4 -d\"`
     rm ${tmp_file}.altlang
     if [ "${new_lang}" != "" ] ; then
-      if [ "${new_lang}" == "CA" ] || [ "${new_lang}" == "UK" ] || [ "${new_lang}" == "UN" ] ; then
+      if [ "${new_lang}" == "UNKNOWN" ] || [ "${new_lang}" == "CA" ] || [ "${new_lang}" == "UN" ] ; then
         new_lang=""
       else
         break
@@ -410,8 +488,8 @@ function get_new_filename() {
 
 function not_valid() {
 
-  echo ". not valid, deleting."
-  rm ${output_dir}/${xml_filename}
+  echo ". not valid, moving to ${xml_filename}.bad"
+  mv ${output_dir}/${xml_filename} ${output_dir}/${xml_filename}.bad
 }
 
 function is_valid() {
@@ -477,11 +555,6 @@ function correct_bad_languages () {
 
 function convert_file() {
 
-  let length=$(echo ${i} | wc -c)
-  if [ $length -ne 16 ] ; then
-    return
-  fi
-
   echo -n "Processing ${i} . "
 
   if [ ! -f ${i} ] ; then
@@ -491,25 +564,51 @@ function convert_file() {
 
   base_filename=`basename ${i} .txt`
   xml_tmp_file=${scratch_dir}/${base_filename}.tmp.xml
-  xml_filename=${base_filename}.xml
+
+  if [ "${xml_filename}" == "" ] ; then
+    let length=$(echo ${i} | wc -c)
+    if [ ${length} -ne 16 ] ; then
+      return
+    fi
+  fi
+
   base_xml_filename=${base_filename}
   tmp_file=${scratch_dir}/${base_filename}.tmp
   pwd=`pwd`
   language=`basename ${pwd} | tr a-z A-Z`
 
   if [ "$RENAME_FILES" == "1" ] ; then
-    get_new_filename
+    if [ "${xml_filename}" == "" ] ; then
+      get_new_filename
+    fi
+  else
+    xml_filename=${base_filename}.xml
   fi
 
   if [ "$SKIP_EXISTING" == "1" ] && [ -f ${output_dir}/${xml_filename} ] ; then
     echo "output file exists, skipping."
+    xml_filename=""
     return
   fi
 
   cp ${i} ${tmp_file}
 
+  # convert S&amp;D to S-D
+  sed -i -e 's/S&amp;D/S-D/g' ${tmp_file}
+
   # add quotes to ID tags
   sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}
+
+  # add alternate style (FR) languages in the text into the LANGUAGE attribute
+  sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}
+  sed -i -e 's/> \?/>\n/g' ${tmp_file}
+
+  # switch NAME and LANGUAGE attributes for newer files
+  sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}
+
+  # remove duplicate languages (the one in brackets is usually correct)
+  sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}
+  sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}
   
   english_phrases
   missing_languages
@@ -545,6 +644,8 @@ function convert_file() {
          -e 's/\(NAME=\".*\)"\(.*\"\)/\1\2/g'        \
          -e "s/\(NAME=\".*\)'\(.*\"\)/\1\2/g" ${tmp_file}
 
+  sed -i -e 's/\(NAME="[^"]*\) AFFILIATION=\([^"]*\)">/\1" AFFILIATION="\2">/g' ${tmp_file}
+
   echo "<body>" > ${xml_tmp_file}
   echo "<filename id=\"${base_xml_filename}\" />" >> ${xml_tmp_file}
   echo "<language id=\"${language}\" />" >> ${xml_tmp_file}
@@ -555,13 +656,13 @@ function convert_file() {
   xsltproc -o  ${output_dir}/${xml_filename} --novalid ${scratch_dir}/${xsl_file} ${xml_tmp_file} || exit 1 
   # this removes any EPparty attributes that don't match the DTD
   # if you change the DTD above or elsewhere, change it here too
-  sed -i -e 's/ EPparty="\(PPE-DE\|PSE\|ALDE\|Verts-ALE\|GUE-NGL\|IND-DEM\|UEN\|NI\|ELDR\|EDD\|EPP-DE\|PPE\|UPE\|TDI\|UNKNOWN\)"/@="\1"/g
+  sed -i -e 's/ EPparty="\(PPE-DE\|PSE\|ALDE\|Verts-ALE\|GUE-NGL\|IND-DEM\|UEN\|NI\|ELDR\|EDD\|EPP-DE\|PPE\|UPE\|TDI\|EFD\|ITS\|ECR\|S-D\|UNKNOWN\)"/@="\1"/g
              s/  *EPparty="[^"]*"//g
              s/@="/ EPparty="/g' ${output_dir}/${xml_filename}
 
   # remove this for now. in future, sometimes the affiliation
   # contains the post.
-  sed -i -e 's/\(<name>.*\)AFFILIATION=.*\(<\/name>\)/\1\2/g' ${output_dir}/${xml_filename}
+#  sed -i -e 's/\(<name>.*\)AFFILIATION=.*\(<\/name>\)/\1\2/g' ${output_dir}/${xml_filename}
 
   xmllint --noout --valid ${output_dir}/${xml_filename} && is_valid || not_valid
 
@@ -569,6 +670,8 @@ function convert_file() {
     rm ${tmp_file}
     rm ${xml_tmp_file}
   fi
+
+  xml_filename=""
 
 }
 
@@ -596,9 +699,11 @@ function rm_tmp_files () {
 
 function find_alt_langs () {
 
+  if [ "${alt_langs}" == "" ] ; then
   # assume we are in the $current_lang directory
-  current=`basename ${PWD}`
-  alt_langs=`ls .. | grep -v ${current}`
+    current=`basename ${PWD}`
+    alt_langs=`ls .. | grep -v ${current}`
+  fi
 
 }
 
@@ -610,22 +715,101 @@ function prereqs () {
 
 }
 
-prereqs
-if [ "$1" == "" ] ; then
-  usage
-else
+function concat_file_parts() {
+
+  files=""
+  for i in  *.txt ; do
+    let length=$(echo ${i} | wc -c)
+    if [ $length -gt 16 ] ; then
+      base=$(basename ${i} .txt | cut -f 1-4 -d -)
+      echo ${files} | grep ${base} 2>&1 >/dev/null
+      if [ $? -ne 0 ] ; then
+        files="${files} ${base}"
+      fi
+    fi
+  done
+
+  for i in ${files} ; do
+    rm -f ${i}.txt
+    for j in ${i}*.txt ; do
+      cat ${j} >>${i}.txt
+    done
+  done
+
+}
+
+function preprocess() {
+
+  find_alt_langs
+  concat_file_parts
+  for lang in ${alt_langs} ; do
+    cd ../${lang}
+    concat_file_parts
+  done
+  cd ../${current}
+
+}
+
+
+function convert() {
+
+  prereqs
   create_tmp_dir
   create_tmp_files
-  if [ "${alt_langs}" == "" ] ; then
-    find_alt_langs
-  fi
-  if [ "$1" == "all" ] ; then
+  find_alt_langs
+  if [ "${parse_all}" == "1" ] ; then
     convert_all
-  else
-    i=$1
+  elif [ "${convert_files}" == "1" ] ; then
+    i=${infile}
     convert_file
+  else
+    echo "Error: no files specified for converstion."
+    usage
   fi
   rm_tmp_files
   rm_tmp_dir
-fi
 
+}
+
+function parseopts() {
+
+  while getopts "dapcf:o:" opt; do
+    case ${opt} in
+      d)
+        set -ex
+        ;;
+      a)
+        parse_all=1
+        ;;
+      p)
+        preprocess_files=1
+        ;;
+      c)
+        convert_files=1
+        ;;
+      f)
+        infile=$OPTARG
+        ;;
+      o)
+        xml_filename=$OPTARG
+        ;;
+      *)
+        usage
+        ;;
+    esac
+  done
+}
+
+parseopts $@
+
+#parse_all=1
+#convert_files=1
+#infile=$1
+
+if [ "${preprocess_files}" == "1" ] ; then
+  preprocess
+elif [ "${convert_files}" == "1" ] ; then
+  convert
+else
+  usage
+fi
