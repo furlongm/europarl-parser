@@ -757,11 +757,6 @@ parseopts() {
 
 parseopts $@
 
-#parse_all=1
-#convert_files=1
-#infile=$1
-
-prereqs
 if [ "${convert_files}" == "1" ] ; then
     convert
 else
