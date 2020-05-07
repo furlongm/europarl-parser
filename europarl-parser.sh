@@ -100,7 +100,7 @@ usage() {
 }
 
 create_tmp_dir() {
-    scratch_dir=`mktemp -d -t -p ${tmp_dir}`
+    scratch_dir=$(mktemp -d -t -p ${tmp_dir})
     if [ "$?" != "0" ] ; then
         echo "Problem creating temporary directory, is mktemp installed?"
         usage
@@ -399,7 +399,7 @@ find_new_lang() {
         sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}.altlang
         sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}.altlang
         sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}.altlang
-        new_lang=`grep "${first_segment}" ${tmp_file}.altlang | cut -f4 -d\"`
+        new_lang=$(grep "${first_segment}" ${tmp_file}.altlang | cut -f4 -d\")
         rm ${tmp_file}.altlang
         if [ "${new_lang}" != "" ] ; then
             if [ "${new_lang}" == "UNKNOWN" ] || [ "${new_lang}" == "CA" ] || [ "${new_lang}" == "UN" ] ; then
@@ -416,15 +416,15 @@ missing_languages() {
     IFS="
 "
     sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}
-    for speaker_segment in `grep "SPEAKER ID" ${tmp_file}` ; do
+    for speaker_segment in $(grep "SPEAKER ID" ${tmp_file}) ; do
         new_lang=""
-        old_lang=`echo "${speaker_segment}" | cut -f4 -d\"`
-        first_segment=`echo "${speaker_segment}" | cut -f1-3 -d\"`
+        old_lang=$(echo "${speaker_segment}" | cut -f4 -d\")
+        first_segment=$(echo "${speaker_segment}" | cut -f1-3 -d\")
         if [ "${old_lang}" == "" ] ; then
             find_new_lang
             if [ "${new_lang}" != "" ] ; then
-                second_segment=`echo $speaker_segment | sed -e 's/\\//\\\\\//g' -e 's/\\*//g' -e 's/\\[/\\\\[/g' \
-                                                -e 's/\\]/\\\\]/g'  | cut -f5- -d\"`
+                second_segment=$(echo $speaker_segment | sed -e 's/\\//\\\\\//g' -e 's/\\*//g' -e 's/\\[/\\\\[/g' \
+                                                -e 's/\\]/\\\\]/g'  | cut -f5- -d\")
                 sed -i -e "s/\(${first_segment}\"\).*\(\"${second_segment}\)/\1${new_lang}\2/" ${tmp_file}
             fi
         fi
@@ -440,7 +440,7 @@ convert_all() {
 }
 
 get_new_filename() {
-    let year=10#`echo ${base_filename} | cut -f 2 -d -`
+    let year=10#$(echo ${base_filename} | cut -f 2 -d -)
     if [ ${year} -gt 95 ] ; then
         year=19${year}
     else
@@ -450,8 +450,8 @@ get_new_filename() {
             year=20${year}
         fi
     fi
-    month=`echo ${base_filename} | cut -f 3 -d -`
-    day=`echo ${base_filename} | cut -f 4 -d -`
+    month=$(echo ${base_filename} | cut -f 3 -d -)
+    day=$(echo ${base_filename} | cut -f 4 -d -)
     base_xml_filename=${language}${year}${month}${day}
     xml_filename=${base_xml_filename}.xml
 }
@@ -527,7 +527,7 @@ convert_file() {
         return
     fi
 
-    base_filename=`basename ${i} .txt`
+    base_filename=$(basename ${i} .txt)
     xml_tmp_file=${scratch_dir}/${base_filename}.tmp.xml
     if [ "${xml_filename}" == "" ] ; then
         let length=$(echo ${i} | wc -c)
@@ -537,8 +537,7 @@ convert_file() {
     fi
     base_xml_filename=${base_filename}
     tmp_file=${scratch_dir}/${base_filename}.tmp
-    pwd=`pwd`
-    language=`basename ${pwd} | tr a-z A-Z`
+    language=$(basename $(pwd) | tr a-z A-Z)
 
     if [ "$RENAME_FILES" == "1" ] ; then
         if [ "${xml_filename}" == "" ] ; then
@@ -681,9 +680,8 @@ missing_prereqs() {
 }
 
 concat_file_parts() {
-
-    files=""
-    for i in    *.txt ; do
+    files=
+    for i in *.txt ; do
         let length=$(echo ${i} | wc -c)
         if [ $length -gt 16 ] ; then
             base=$(basename ${i} .txt | cut -f 1-4 -d -)
@@ -700,7 +698,6 @@ concat_file_parts() {
             cat ${j} >>${i}.txt
         done
     done
-
 }
 
 preprocess() {
@@ -714,7 +711,6 @@ preprocess() {
     cd ../${current}
 
 }
-
 
 convert() {
     prereqs
@@ -732,7 +728,6 @@ convert() {
     fi
     rm_tmp_files
     rm_tmp_dir
-
 }
 
 parseopts() {
