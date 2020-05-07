@@ -19,7 +19,7 @@
 #
 # Typical usage
 # -------------
-# $ wget http://www.statmt.org/europarl/v6/europarl.tgz
+# $ wget http://www.statmt.org/europarl/v7/europarl.tgz
 # $ tar xf europarl.tgz
 # $ cd europarl/txt/en
 # $ ../../../europarl-parser.sh -p
