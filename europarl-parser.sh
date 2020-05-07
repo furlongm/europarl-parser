@@ -792,7 +792,6 @@ parseopts $@
 #infile=$1
 
 prereqs
-preprocess
 if [ "${convert_files}" == "1" ] ; then
     convert
 else
