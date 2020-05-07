@@ -39,7 +39,7 @@
 # ECPC: European Comparable and Parallel Corpora
 # XML DTD for europarl corpus provided by ECPC
 #
-# http://modnlp.berlios.de/
+# http://modnlp.sourceforge.net/
 # MODNLP: Modular Suite of NLP Tools
 # The output files can be processed by MODNLP (and converted to ARFF)
 #
