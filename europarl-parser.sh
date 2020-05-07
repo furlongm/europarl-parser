@@ -100,7 +100,6 @@ usage() {
 }
 
 create_tmp_dir() {
-
     scratch_dir=`mktemp -d -t -p ${tmp_dir}`
     if [ "$?" != "0" ] ; then
         echo "Problem creating temporary directory, is mktemp installed?"
@@ -109,14 +108,12 @@ create_tmp_dir() {
 }
 
 rm_tmp_dir() {
-
     if [ "REMOVE_TMP_FILES" == "1" ] ; then
         rm -fr ${scratch_dir}
     fi
 }
 
 output_dtd() {
-
     if [ ! -e ${output_dir}/ep.dtd ] ; then
         cat > ${output_dir}/ep.dtd << EOF
 <!-- ep.dtd: EC Parliament sessions. $Revision: 1.7 $ -->
@@ -171,7 +168,6 @@ EOF
 }
 
 output_xslt() {
-
     if [ ! -e ${xsl_file} ] ; then
         cat > ${xsl_file} << EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -329,7 +325,6 @@ EOF
 }
 
 output_indent() {
-
     if [ ! -e ${indent_file} ] ; then
         cat > ${indent_file} << EOF
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -383,7 +378,6 @@ EOF
 }
 
 find_new_lang() {
-
     for lang in ${alt_langs} ; do
         alt_lang_file=""
         if [ -f ../${lang}/${i} ] ; then
@@ -418,7 +412,6 @@ find_new_lang() {
 }
 
 missing_languages() {
-
     OLDIFS=$IFS
     IFS="
 "
@@ -436,13 +429,10 @@ missing_languages() {
             fi
         fi
     done
-
     IFS=$OLDIFS
-
 }
 
 convert_all() {
-
     for j in *.txt ; do
         i=${j}
         convert_file
@@ -450,7 +440,6 @@ convert_all() {
 }
 
 get_new_filename() {
-
     let year=10#`echo ${base_filename} | cut -f 2 -d -`
     if [ ${year} -gt 95 ] ; then
         year=19${year}
@@ -468,13 +457,11 @@ get_new_filename() {
 }
 
 not_valid() {
-
     echo ". not valid, moving to ${xml_filename}.bad"
     mv ${output_dir}/${xml_filename} ${output_dir}/${xml_filename}.bad
 }
 
 is_valid() {
-
     echo -n ". (valid)"
     if [ "$INDENT" == "1" ] ; then
         xsltproc -o ${output_dir}/${xml_filename} ${scratch_dir}/${indent_file} ${output_dir}/${xml_filename} && echo " (indented)"
@@ -482,7 +469,6 @@ is_valid() {
 }
 
 english_phrases() {
-
     sed -i -e 's/VOTES*//g' \
     -e 's/(*Parliament adopted the resolution)*//g' \
     -e 's/(*Parliament adopted the Commission proposal)*//g' \
@@ -516,7 +502,6 @@ english_phrases() {
 }
 
 correct_bad_languages() {
-
     # verified by cross-referencing the other languages
     sed -i -e 's/LANGUAGE="SI"/LANGUAGE="SL"/g' \
     -e 's/LANGUAGE="NI"/LANGUAGE="FR"/g' \
@@ -535,7 +520,6 @@ correct_bad_languages() {
 }
 
 convert_file() {
-
     echo -n "Processing ${i} . "
 
     if [ ! -f ${i} ] ; then
@@ -545,14 +529,12 @@ convert_file() {
 
     base_filename=`basename ${i} .txt`
     xml_tmp_file=${scratch_dir}/${base_filename}.tmp.xml
-
     if [ "${xml_filename}" == "" ] ; then
         let length=$(echo ${i} | wc -c)
         if [ ${length} -ne 16 ] ; then
             return
         fi
     fi
-
     base_xml_filename=${base_filename}
     tmp_file=${scratch_dir}/${base_filename}.tmp
     pwd=`pwd`
@@ -653,11 +635,10 @@ convert_file() {
     fi
 
     xml_filename=""
-
+    cd ${oldpwd}
 }
 
 create_tmp_files() {
-
     if [ ! -e ${output_dir} ] ; then
         mkdir -p ${output_dir}
     fi
@@ -669,7 +650,6 @@ create_tmp_files() {
 }
 
 rm_tmp_files() {
-
     if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
         pushd ${scratch_dir} > /dev/null
         rm $xsl_file
@@ -679,13 +659,11 @@ rm_tmp_files() {
 }
 
 find_alt_langs() {
-
     if [ "${alt_langs}" == "" ] ; then
     # assume we are in the $current_lang directory
         current=`basename ${PWD}`
         alt_langs=`ls .. | grep -v ${current}`
     fi
-
 }
 
 prereqs() {
