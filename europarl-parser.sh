@@ -622,9 +622,8 @@ convert_file() {
                          s/  *EPparty="[^"]*"//g
                          s/@="/ EPparty="/g' ${output_dir}/${xml_filename}
 
-    # remove this for now. in future, sometimes the affiliation
-    # contains the post.
-#  sed -i -e 's/\(<name>.*\)AFFILIATION=.*\(<\/name>\)/\1\2/g' ${output_dir}/${xml_filename}
+    # Remove this for now. For future reference, sometimes the affiliation contains the post
+    # sed -i -e 's/\(<name>.*\)AFFILIATION=.*\(<\/name>\)/\1\2/g' ${output_dir}/${xml_filename}
 
     xmllint --noout --valid ${output_dir}/${xml_filename} && is_valid || not_valid
 
