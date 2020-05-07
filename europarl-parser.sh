@@ -87,7 +87,7 @@ xsl_file=ep.dtd.xsl
 indent_file=indent.xsl
 tmp_dir=/tmp
 
-function usage() {
+usage() {
   echo
   echo "This script converts Europarl Parallel Corpus txt files to ep.dtd-compliant xml"
   echo "See comments in script for futher information."
@@ -110,7 +110,7 @@ function usage() {
   exit 0
 }
 
-function create_tmp_dir() {
+create_tmp_dir() {
 
   scratch_dir=`mktemp -d -t -p ${tmp_dir}`
   if [ "$?" != "0" ] ; then
@@ -119,14 +119,14 @@ function create_tmp_dir() {
   fi
 }
 
-function rm_tmp_dir() {
+rm_tmp_dir() {
 
   if [ "REMOVE_TMP_FILES" == "1" ] ; then
     rm -fr ${scratch_dir}
   fi
 }
 
-function output_dtd() {
+output_dtd() {
 
   if [ ! -e ${output_dir}/ep.dtd ] ; then
     cat > ${output_dir}/ep.dtd << EOF
@@ -181,7 +181,7 @@ EOF
   fi;
 }
 
-function output_xslt() {
+output_xslt() {
 
   if [ ! -e ${xsl_file} ] ; then
     cat > ${xsl_file} << EOF
@@ -339,7 +339,7 @@ EOF
   fi
 }
 
-function output_indent() {
+output_indent() {
 
   if [ ! -e ${indent_file} ] ; then
     cat > ${indent_file} << EOF
@@ -393,7 +393,7 @@ EOF
   fi
 }
 
-function find_new_lang() {
+find_new_lang() {
 
   for lang in ${alt_langs} ; do
     alt_lang_file=""
@@ -428,7 +428,7 @@ function find_new_lang() {
   done
 }
 
-function missing_languages() {
+missing_languages() {
 
   OLDIFS=$IFS
   IFS="
@@ -452,7 +452,7 @@ function missing_languages() {
 
 }
 
-function convert_all() {
+convert_all() {
 
   for j in *.txt ; do
     i=${j}
@@ -460,7 +460,7 @@ function convert_all() {
   done
 }
 
-function get_new_filename() {
+get_new_filename() {
 
   let year=10#`echo ${base_filename} | cut -f 2 -d -`
   if [ ${year} -gt 95 ] ; then
@@ -478,13 +478,13 @@ function get_new_filename() {
   xml_filename=${base_xml_filename}.xml
 }
 
-function not_valid() {
+not_valid() {
 
   echo ". not valid, moving to ${xml_filename}.bad"
   mv ${output_dir}/${xml_filename} ${output_dir}/${xml_filename}.bad
 }
 
-function is_valid() {
+is_valid() {
 
   echo -n ". (valid)"
   if [ "$INDENT" == "1" ] ; then
@@ -492,7 +492,7 @@ function is_valid() {
   fi
 }
 
-function english_phrases() {
+english_phrases() {
 
   sed -i -e 's/VOTES*//g' \
   -e 's/(*Parliament adopted the resolution)*//g' \
@@ -526,7 +526,7 @@ function english_phrases() {
   -e 's/(*Adjournment of the session)*//g' ${tmp_file}
 }
 
-function correct_bad_languages () {
+correct_bad_languages() {
 
   # verified by cross-referencing the other languages
   sed -i -e 's/LANGUAGE="SI"/LANGUAGE="SL"/g' \
@@ -545,7 +545,7 @@ function correct_bad_languages () {
   -e 's/LANGUAGE="EM"//g' ${tmp_file}
 }
 
-function convert_file() {
+convert_file() {
 
   echo -n "Processing ${i} . "
 
@@ -667,7 +667,7 @@ function convert_file() {
 
 }
 
-function create_tmp_files () {
+create_tmp_files() {
 
   if [ ! -e ${output_dir} ] ; then
     mkdir -p ${output_dir}
@@ -679,7 +679,7 @@ function create_tmp_files () {
   output_dtd
 }
 
-function rm_tmp_files () {
+rm_tmp_files() {
 
   if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
     pushd ${scratch_dir} > /dev/null
@@ -689,7 +689,7 @@ function rm_tmp_files () {
   fi
 }
 
-function find_alt_langs () {
+find_alt_langs() {
 
   if [ "${alt_langs}" == "" ] ; then
   # assume we are in the $current_lang directory
@@ -699,7 +699,6 @@ function find_alt_langs () {
 
 }
 
-function prereqs () {
 
   # check libxml and libxslt are installed (libexslt as well?)
   xsltproc --dumpextensions | grep replace 2>&1 > /dev/null || usage
@@ -707,7 +706,7 @@ function prereqs () {
 
 }
 
-function concat_file_parts() {
+concat_file_parts() {
 
   files=""
   for i in  *.txt ; do
@@ -730,7 +729,7 @@ function concat_file_parts() {
 
 }
 
-function preprocess() {
+preprocess() {
 
   find_alt_langs
   concat_file_parts
@@ -743,8 +742,7 @@ function preprocess() {
 }
 
 
-function convert() {
-
+convert() {
   prereqs
   create_tmp_dir
   create_tmp_files
@@ -763,8 +761,7 @@ function convert() {
 
 }
 
-function parseopts() {
-
+parseopts() {
   while getopts "dapcf:o:" opt; do
     case ${opt} in
       d)
