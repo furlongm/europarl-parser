@@ -96,16 +96,8 @@ usage() {
   echo "$0 -c -f FILE (converts a single file to ecpc_EP xml)"
   echo "$0 -c -a      (converts all files in current directory)"
   echo
-  echo "N.B. 2"
   echo "This script should be run in the language directory of the corpus."
-  echo "E.g. europarl/txt/en for english."
-  echo
-  echo "N.B. 3"
-  echo "This script requires libxslt installed on your system with the str:replace"
-  echo "extension. Try"
-  echo " \$ 'xsltproc --dumpextensions | grep replace'"
-  echo "to check if it is installed. libxml is also required to check the validity of"
-  echo "the resultant xml files."
+  echo "e.g. europarl/txt/en for english."
   echo 
   exit 0
 }
@@ -699,11 +691,18 @@ find_alt_langs() {
 
 }
 
+prereqs() {
+    xsltproc --dumpextensions | grep -q replace || missing_prereqs
+    which xmllint 2>&1 >/dev/null || missing_prereqs
+}
 
-  # check libxml and libxslt are installed (libexslt as well?)
-  xsltproc --dumpextensions | grep replace 2>&1 > /dev/null || usage
-  xmllint --testIO 2>&1 > /dev/null || usage
-
+missing_prereqs() {
+    echo 'This script requires libxslt with the str:replace extension. Try'
+    echo " \$ 'xsltproc --dumpextensions | grep replace'"
+    echo 'to check if it is installed.'
+    echo
+    echo 'libxml is also required to check the validity of echo the resultant xml files.'
+    exit 1
 }
 
 concat_file_parts() {
