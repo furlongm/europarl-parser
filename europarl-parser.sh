@@ -63,9 +63,6 @@
 #   typically has both abbreviations listed for each party.
 # * replace Greek keyboard UTF-8 characters (currently handled modnlp)
 
-# Uncomment the following line to debug
-#set -x
-
 # Some user variables
 REMOVE_TMP_FILES=0 # set to 1 to remove temporary files, 0 otherwise
 INDENT=1           # set to 1 to indent the xml files, 0 otherwise
