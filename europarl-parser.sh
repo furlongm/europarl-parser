@@ -36,7 +36,7 @@
 # The Europarl parallel corpus is extracted from the proceedings of the European Parliament.
 #
 # http://www.ecpc.uji.es/
-# ECPC: European Comparable and Parallel Corpora 
+# ECPC: European Comparable and Parallel Corpora
 # XML DTD for europarl corpus provided by ECPC
 #
 # http://modnlp.berlios.de/
@@ -51,7 +51,7 @@
 # Future enhancements (to be done)
 # -------------------------
 # * xsl file - when President etc is encountered in a NAME tag
-#   remove it and add it to POST tag     
+#   remove it and add it to POST tag
 # * currently only removes phrases in english
 # * currently only recognises WRITING in english (by finding "riting"
 #   in AFFILIATION tag
@@ -88,40 +88,40 @@ indent_file=indent.xsl
 tmp_dir=/tmp
 
 usage() {
-  echo
-  echo "This script converts Europarl Parallel Corpus txt files to ep.dtd-compliant xml"
-  echo "See comments in script for futher information."
-  echo
-  echo "Usage:"
-  echo "$0 -c -f FILE (converts a single file to ecpc_EP xml)"
-  echo "$0 -c -a      (converts all files in current directory)"
-  echo
-  echo "This script should be run in the language directory of the corpus."
-  echo "e.g. europarl/txt/en for english."
-  echo 
-  exit 0
+    echo
+    echo "This script converts Europarl Parallel Corpus txt files to ep.dtd-compliant xml"
+    echo "See comments in script for futher information."
+    echo
+    echo "Usage:"
+    echo "$0 -c -f FILE (converts a single file to ecpc_EP xml)"
+    echo "$0 -c -a          (converts all files in current directory)"
+    echo
+    echo "This script should be run in the language directory of the corpus."
+    echo "e.g. europarl/txt/en for english."
+    echo
+    exit 0
 }
 
 create_tmp_dir() {
 
-  scratch_dir=`mktemp -d -t -p ${tmp_dir}`
-  if [ "$?" != "0" ] ; then
-    echo "Problem creating temporary directory, is mktemp installed?"
-    usage
-  fi
+    scratch_dir=`mktemp -d -t -p ${tmp_dir}`
+    if [ "$?" != "0" ] ; then
+        echo "Problem creating temporary directory, is mktemp installed?"
+        usage
+    fi
 }
 
 rm_tmp_dir() {
 
-  if [ "REMOVE_TMP_FILES" == "1" ] ; then
-    rm -fr ${scratch_dir}
-  fi
+    if [ "REMOVE_TMP_FILES" == "1" ] ; then
+        rm -fr ${scratch_dir}
+    fi
 }
 
 output_dtd() {
 
-  if [ ! -e ${output_dir}/ep.dtd ] ; then
-    cat > ${output_dir}/ep.dtd << EOF
+    if [ ! -e ${output_dir}/ep.dtd ] ; then
+        cat > ${output_dir}/ep.dtd << EOF
 <!-- ep.dtd: EC Parliament sessions. $Revision: 1.7 $ -->
 <!ELEMENT ecpc_EP (header,body,back)>
 <!ELEMENT header (title|index|omit)*>
@@ -170,13 +170,13 @@ national_party CDATA #IMPLIED>
 <!ELEMENT update (#PCDATA)>
 <!ELEMENT disclaimer (#PCDATA)>
 EOF
-  fi;
+    fi;
 }
 
 output_xslt() {
 
-  if [ ! -e ${xsl_file} ] ; then
-    cat > ${xsl_file} << EOF
+    if [ ! -e ${xsl_file} ] ; then
+        cat > ${xsl_file} << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -328,13 +328,13 @@ output_xslt() {
 
 </xsl:stylesheet>
 EOF
-  fi
+    fi
 }
 
 output_indent() {
 
-  if [ ! -e ${indent_file} ] ; then
-    cat > ${indent_file} << EOF
+    if [ ! -e ${indent_file} ] ; then
+        cat > ${indent_file} << EOF
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml" encoding="UTF-8"/>
   <xsl:param name="indent-increment" select="'   '"/>
@@ -346,23 +346,23 @@ output_indent() {
   
   <xsl:template match="comment() | processing-instruction()">
     <xsl:param name="indent" select="''"/>
-    <xsl:call-template name="newline"/>    
+    <xsl:call-template name="newline"/>
     <xsl:value-of select="\$indent"/>
     <xsl:copy />
   </xsl:template>
   
   <xsl:template match="text()">
     <xsl:param name="indent" select="''"/>
-    <xsl:call-template name="newline"/>    
+    <xsl:call-template name="newline"/>
     <xsl:value-of select="\$indent"/>
     <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
-    
+  
   <xsl:template match="text()[normalize-space(.)='']"/>
   
   <xsl:template match="*">
     <xsl:param name="indent" select="''"/>
-    <xsl:call-template name="newline"/>    
+    <xsl:call-template name="newline"/>
     <xsl:value-of select="\$indent"/>
       <xsl:choose>
        <xsl:when test="count(child::*) > 0">
@@ -374,320 +374,320 @@ output_indent() {
          <xsl:call-template name="newline"/>
          <xsl:value-of select="\$indent"/>
         </xsl:copy>
-       </xsl:when>       
+       </xsl:when>
        <xsl:otherwise>
         <xsl:copy-of select="."/>
        </xsl:otherwise>
      </xsl:choose>
-  </xsl:template>    
+  </xsl:template>
 </xsl:stylesheet>
 EOF
-  fi
+    fi
 }
 
 find_new_lang() {
 
-  for lang in ${alt_langs} ; do
-    alt_lang_file=""
-    if [ -f ../${lang}/${i} ] ; then
-      alt_lang_file=../${lang}/${i}
-    else
-      continue
-    fi
-    cp ${alt_lang_file} ${tmp_file}.altlang
-    sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}.altlang
+    for lang in ${alt_langs} ; do
+        alt_lang_file=""
+        if [ -f ../${lang}/${i} ] ; then
+            alt_lang_file=../${lang}/${i}
+        else
+            continue
+        fi
+        cp ${alt_lang_file} ${tmp_file}.altlang
+        sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}.altlang
 
-    # add alternate style (FR) languages in the text into the LANGUAGE attribute
-    sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}.altlang
-    sed -i -e 's/> \?/>\n/g' ${tmp_file}.altlang
+        # add alternate style (FR) languages in the text into the LANGUAGE attribute
+        sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}.altlang
+        sed -i -e 's/> \?/>\n/g' ${tmp_file}.altlang
 
-    # switch NAME and LANGUAGE attributes for newer files
-    sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}.altlang
+        # switch NAME and LANGUAGE attributes for newer files
+        sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}.altlang
 
-    # remove duplicate languages (the one in brackets is usually correct)
-    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}.altlang
-    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}.altlang
-    sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}.altlang
-    new_lang=`grep "${first_segment}" ${tmp_file}.altlang | cut -f4 -d\"`
-    rm ${tmp_file}.altlang
-    if [ "${new_lang}" != "" ] ; then
-      if [ "${new_lang}" == "UNKNOWN" ] || [ "${new_lang}" == "CA" ] || [ "${new_lang}" == "UN" ] ; then
-        new_lang=""
-      else
-        break
-      fi
-    fi
-  done
+        # remove duplicate languages (the one in brackets is usually correct)
+        sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}.altlang
+        sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}.altlang
+        sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}.altlang
+        new_lang=`grep "${first_segment}" ${tmp_file}.altlang | cut -f4 -d\"`
+        rm ${tmp_file}.altlang
+        if [ "${new_lang}" != "" ] ; then
+            if [ "${new_lang}" == "UNKNOWN" ] || [ "${new_lang}" == "CA" ] || [ "${new_lang}" == "UN" ] ; then
+                new_lang=""
+            else
+                break
+            fi
+        fi
+    done
 }
 
 missing_languages() {
 
-  OLDIFS=$IFS
-  IFS="
+    OLDIFS=$IFS
+    IFS="
 "
-  sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}
-  for speaker_segment in `grep "SPEAKER ID" ${tmp_file}` ; do
-    new_lang=""
-    old_lang=`echo "${speaker_segment}" | cut -f4 -d\"`
-    first_segment=`echo "${speaker_segment}" | cut -f1-3 -d\"`
-    if [ "${old_lang}" == "" ] ; then
-      find_new_lang
-      if [ "${new_lang}" != "" ] ; then
-        second_segment=`echo $speaker_segment | sed -e 's/\\//\\\\\//g' -e 's/\\*//g' -e 's/\\[/\\\\[/g' \
-                        -e 's/\\]/\\\\]/g'  | cut -f5- -d\"`
-        sed -i -e "s/\(${first_segment}\"\).*\(\"${second_segment}\)/\1${new_lang}\2/" ${tmp_file}
-      fi
-    fi
-  done
+    sed -i -e 's/\(SPEAKER ID[^ ]*\)\( NAME=[^>]*>\)/\1 LANGUAGE=\"\"\2/g' ${tmp_file}
+    for speaker_segment in `grep "SPEAKER ID" ${tmp_file}` ; do
+        new_lang=""
+        old_lang=`echo "${speaker_segment}" | cut -f4 -d\"`
+        first_segment=`echo "${speaker_segment}" | cut -f1-3 -d\"`
+        if [ "${old_lang}" == "" ] ; then
+            find_new_lang
+            if [ "${new_lang}" != "" ] ; then
+                second_segment=`echo $speaker_segment | sed -e 's/\\//\\\\\//g' -e 's/\\*//g' -e 's/\\[/\\\\[/g' \
+                                                -e 's/\\]/\\\\]/g'  | cut -f5- -d\"`
+                sed -i -e "s/\(${first_segment}\"\).*\(\"${second_segment}\)/\1${new_lang}\2/" ${tmp_file}
+            fi
+        fi
+    done
 
-  IFS=$OLDIFS
+    IFS=$OLDIFS
 
 }
 
 convert_all() {
 
-  for j in *.txt ; do
-    i=${j}
-    convert_file
-  done
+    for j in *.txt ; do
+        i=${j}
+        convert_file
+    done
 }
 
 get_new_filename() {
 
-  let year=10#`echo ${base_filename} | cut -f 2 -d -`
-  if [ ${year} -gt 95 ] ; then
-    year=19${year}
-  else
-    if [ ${year} -lt 10 ] ; then
-      year=200${year}
+    let year=10#`echo ${base_filename} | cut -f 2 -d -`
+    if [ ${year} -gt 95 ] ; then
+        year=19${year}
     else
-      year=20${year}
+        if [ ${year} -lt 10 ] ; then
+            year=200${year}
+        else
+            year=20${year}
+        fi
     fi
-  fi
-  month=`echo ${base_filename} | cut -f 3 -d -`
-  day=`echo ${base_filename} | cut -f 4 -d -`
-  base_xml_filename=${language}${year}${month}${day}
-  xml_filename=${base_xml_filename}.xml
+    month=`echo ${base_filename} | cut -f 3 -d -`
+    day=`echo ${base_filename} | cut -f 4 -d -`
+    base_xml_filename=${language}${year}${month}${day}
+    xml_filename=${base_xml_filename}.xml
 }
 
 not_valid() {
 
-  echo ". not valid, moving to ${xml_filename}.bad"
-  mv ${output_dir}/${xml_filename} ${output_dir}/${xml_filename}.bad
+    echo ". not valid, moving to ${xml_filename}.bad"
+    mv ${output_dir}/${xml_filename} ${output_dir}/${xml_filename}.bad
 }
 
 is_valid() {
 
-  echo -n ". (valid)"
-  if [ "$INDENT" == "1" ] ; then
-    xsltproc -o ${output_dir}/${xml_filename} ${scratch_dir}/${indent_file} ${output_dir}/${xml_filename} && echo " (indented)"
-  fi
+    echo -n ". (valid)"
+    if [ "$INDENT" == "1" ] ; then
+        xsltproc -o ${output_dir}/${xml_filename} ${scratch_dir}/${indent_file} ${output_dir}/${xml_filename} && echo " (indented)"
+    fi
 }
 
 english_phrases() {
 
-  sed -i -e 's/VOTES*//g' \
-  -e 's/(*Parliament adopted the resolution)*//g' \
-  -e 's/(*Parliament adopted the Commission proposal)*//g' \
-  -e 's/(*Approval of the Minutes)*//g' \
-  -e 's/(*The Minutes were approved)*//g' \
-  -e 's/(Applause[^)]*)//g' \
-  -e 's/Applause//g' \
-  -e 's/(*Murmurs of dissent)*//g' \
-  -e 's/Draft Amendment No//g' \
-  -e 's/(*Parliament adopted the legislative resolution)*//g' \
-  -e 's/(*Parliament gave its assent)*//g' \
-  -e 's/(*Parliament rejected the motion for a resolution)*//g' \
-  -e 's/(The sitting was[^)]*)//g' \
-  -e 's/(Parliament rejected the[^)]*)//g' \
-  -e 's/(The President cut.*)//g' \
-  -e 's/(*Vigorous applause)*//g' \
-  -e 's/(*Loud applause)*//g' \
-  -e 's/(The President interrupted[^)]*)//g' \
-  -e 's/(The proposal[^)]*)//g' \
-  -e 's/(Mixed reactions)//g' \
-  -e 's/(Laughter and applause)//g' \
-  -e 's/(Laughter)//g' \
-  -e 's/(The oral amendment was[^)]*)//g' \
-  -e 's/.* Report (.*\/[^)]*)//g' \
-  -e 's/(Exclamations)//g' \
-  -e 's/(Explanation of vote abbreviated[^)]*)//g' \
-  -e 's/(Muted applause)//g' \
-  -e 's/(Parliament[^)]*)//g' \
-  -e 's/(The House[^)]*)//g' \
-  -e 's/(*Adjournment of the session)*//g' ${tmp_file}
+    sed -i -e 's/VOTES*//g' \
+    -e 's/(*Parliament adopted the resolution)*//g' \
+    -e 's/(*Parliament adopted the Commission proposal)*//g' \
+    -e 's/(*Approval of the Minutes)*//g' \
+    -e 's/(*The Minutes were approved)*//g' \
+    -e 's/(Applause[^)]*)//g' \
+    -e 's/Applause//g' \
+    -e 's/(*Murmurs of dissent)*//g' \
+    -e 's/Draft Amendment No//g' \
+    -e 's/(*Parliament adopted the legislative resolution)*//g' \
+    -e 's/(*Parliament gave its assent)*//g' \
+    -e 's/(*Parliament rejected the motion for a resolution)*//g' \
+    -e 's/(The sitting was[^)]*)//g' \
+    -e 's/(Parliament rejected the[^)]*)//g' \
+    -e 's/(The President cut.*)//g' \
+    -e 's/(*Vigorous applause)*//g' \
+    -e 's/(*Loud applause)*//g' \
+    -e 's/(The President interrupted[^)]*)//g' \
+    -e 's/(The proposal[^)]*)//g' \
+    -e 's/(Mixed reactions)//g' \
+    -e 's/(Laughter and applause)//g' \
+    -e 's/(Laughter)//g' \
+    -e 's/(The oral amendment was[^)]*)//g' \
+    -e 's/.* Report (.*\/[^)]*)//g' \
+    -e 's/(Exclamations)//g' \
+    -e 's/(Explanation of vote abbreviated[^)]*)//g' \
+    -e 's/(Muted applause)//g' \
+    -e 's/(Parliament[^)]*)//g' \
+    -e 's/(The House[^)]*)//g' \
+    -e 's/(*Adjournment of the session)*//g' ${tmp_file}
 }
 
 correct_bad_languages() {
 
-  # verified by cross-referencing the other languages
-  sed -i -e 's/LANGUAGE="SI"/LANGUAGE="SL"/g' \
-  -e 's/LANGUAGE="NI"/LANGUAGE="FR"/g' \
-  -e 's/LANGUAGE="NK"/LANGUAGE="NL"/g' \
-  -e 's/LANGUAGE="GR"/LANGUAGE="EL"/g' \
-  -e 's/LANGUAGE="ER"/LANGUAGE="EL"/g' \
-  -e 's/LANGUAGE="SP"/LANGUAGE="ES"/g' \
-  -e 's/LANGUAGE="NO"/LANGUAGE="NL"/g' \
-  -e 's/LANGUAGE="IN"/LANGUAGE="IT"/g' \
-  -e 's/LANGUAGE="UK"/LANGUAGE="EN"/g' \
-  -e 's/LANGUAGE="UN"/LANGUAGE="EN"/g' \
-  -e 's/LANGUAGE="CZ"/LANGUAGE="CS"/g' \
-  -e 's/LANGUAGE="DK"/LANGUAGE="DA"/g' \
-  -e 's/LANGUAGE="CA"//g' \
-  -e 's/LANGUAGE="EM"//g' ${tmp_file}
+    # verified by cross-referencing the other languages
+    sed -i -e 's/LANGUAGE="SI"/LANGUAGE="SL"/g' \
+    -e 's/LANGUAGE="NI"/LANGUAGE="FR"/g' \
+    -e 's/LANGUAGE="NK"/LANGUAGE="NL"/g' \
+    -e 's/LANGUAGE="GR"/LANGUAGE="EL"/g' \
+    -e 's/LANGUAGE="ER"/LANGUAGE="EL"/g' \
+    -e 's/LANGUAGE="SP"/LANGUAGE="ES"/g' \
+    -e 's/LANGUAGE="NO"/LANGUAGE="NL"/g' \
+    -e 's/LANGUAGE="IN"/LANGUAGE="IT"/g' \
+    -e 's/LANGUAGE="UK"/LANGUAGE="EN"/g' \
+    -e 's/LANGUAGE="UN"/LANGUAGE="EN"/g' \
+    -e 's/LANGUAGE="CZ"/LANGUAGE="CS"/g' \
+    -e 's/LANGUAGE="DK"/LANGUAGE="DA"/g' \
+    -e 's/LANGUAGE="CA"//g' \
+    -e 's/LANGUAGE="EM"//g' ${tmp_file}
 }
 
 convert_file() {
 
-  echo -n "Processing ${i} . "
+    echo -n "Processing ${i} . "
 
-  if [ ! -f ${i} ] ; then
-    echo "(${i} does not exist)"
-    return
-  fi
-
-  base_filename=`basename ${i} .txt`
-  xml_tmp_file=${scratch_dir}/${base_filename}.tmp.xml
-
-  if [ "${xml_filename}" == "" ] ; then
-    let length=$(echo ${i} | wc -c)
-    if [ ${length} -ne 16 ] ; then
-      return
+    if [ ! -f ${i} ] ; then
+        echo "(${i} does not exist)"
+        return
     fi
-  fi
 
-  base_xml_filename=${base_filename}
-  tmp_file=${scratch_dir}/${base_filename}.tmp
-  pwd=`pwd`
-  language=`basename ${pwd} | tr a-z A-Z`
+    base_filename=`basename ${i} .txt`
+    xml_tmp_file=${scratch_dir}/${base_filename}.tmp.xml
 
-  if [ "$RENAME_FILES" == "1" ] ; then
     if [ "${xml_filename}" == "" ] ; then
-      get_new_filename
+        let length=$(echo ${i} | wc -c)
+        if [ ${length} -ne 16 ] ; then
+            return
+        fi
     fi
-  else
-    xml_filename=${base_filename}.xml
-  fi
 
-  if [ "$SKIP_EXISTING" == "1" ] && [ -f ${output_dir}/${xml_filename} ] ; then
-    echo "output file exists, skipping."
-    xml_filename=""
-    return
-  fi
+    base_xml_filename=${base_filename}
+    tmp_file=${scratch_dir}/${base_filename}.tmp
+    pwd=`pwd`
+    language=`basename ${pwd} | tr a-z A-Z`
 
-  cp ${i} ${tmp_file}
+    if [ "$RENAME_FILES" == "1" ] ; then
+        if [ "${xml_filename}" == "" ] ; then
+            get_new_filename
+        fi
+    else
+        xml_filename=${base_filename}.xml
+    fi
 
-  # convert S&amp;D to S-D
-  sed -i -e 's/S&amp;D/S-D/g' ${tmp_file}
+    if [ "$SKIP_EXISTING" == "1" ] && [ -f ${output_dir}/${xml_filename} ] ; then
+        echo "output file exists, skipping."
+        xml_filename=""
+        return
+    fi
 
-  # add quotes to ID tags
-  sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}
+    cp ${i} ${tmp_file}
 
-  # add alternate style (FR) languages in the text into the LANGUAGE attribute
-  sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}
-  sed -i -e 's/> \?/>\n/g' ${tmp_file}
+    # convert S&amp;D to S-D
+    sed -i -e 's/S&amp;D/S-D/g' ${tmp_file}
 
-  # switch NAME and LANGUAGE attributes for newer files
-  sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}
+    # add quotes to ID tags
+    sed -i -e 's/ID=\([0-9]\+\)/ID="\1"/g' ${tmp_file}
 
-  # remove duplicate languages (the one in brackets is usually correct)
-  sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}
-  sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}
-  
-  english_phrases
-  missing_languages
-  correct_bad_languages
- 
-  # other common errors
-  sed -i -e 's/&/and/g' \
-         -e 's/?ratsa-?sagaropoulou/Kratsa-Tsagaropoulou/g' \
-         -e 's/S<nchez/Sánchez/g'   \
-         -e 's/PPE[–|_]DE/PPE-DE/g' \
-         -e 's/()//g'   \
-         -e 's/<0}*//g' \
-         -e 's/{0>//g'  \
-         -e 's/ \.//g' \
-         -e 's/ –//g' \
-         -e 's/ / /g' \
-         -e 's/<-//g' ${tmp_file} 
+    # add alternate style (FR) languages in the text into the LANGUAGE attribute
+    sed -i -r -n '/>/{N; s/\n//; s/(KER ID="[0-9]+")(.*)>[^<]*\((BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV)\)[ ]*/\1 LANGUAGE="\3"\2>/g;p;}' ${tmp_file}
+    sed -i -e 's/> \?/>\n/g' ${tmp_file}
 
-  # remove paragraphs, empty speaker elements, chapter elements
-  # add quotes to non-quoted ID tags
-  # FIXME: there are still empty speaker elements after this.
-  sed -i -e 's/<SPEAKER.*\/>//g' \
-         -e 's/<\/*P.*>//g' \
-         -e '/<CHAPTER/{ :f; s/<CHAPTER.*\(<SPEAKER\)/\1/; t; N; bf; }' ${tmp_file}
-  sed -i '1i\
+    # switch NAME and LANGUAGE attributes for newer files
+    sed -i -e 's/\(NAME=".*"\)\(.*\)\(LANGUAGE=".*"\) *>/\3 \1\2>/g' ${tmp_file}
+
+    # remove duplicate languages (the one in brackets is usually correct)
+    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) \1/\1/g' ${tmp_file}
+    sed -i -e 's/\(LANGUAGE="[A-Z][A-Z]"\) LANGUAGE="[A-Z]*[A-Z]*"//g' ${tmp_file}
+
+    english_phrases
+    missing_languages
+    correct_bad_languages
+
+    # other common errors
+    sed -i -e 's/&/and/g' \
+                 -e 's/?ratsa-?sagaropoulou/Kratsa-Tsagaropoulou/g' \
+                 -e 's/S<nchez/Sánchez/g'       \
+                 -e 's/PPE[–|_]DE/PPE-DE/g' \
+                 -e 's/()//g'       \
+                 -e 's/<0}*//g' \
+                 -e 's/{0>//g'  \
+                 -e 's/ \.//g' \
+                 -e 's/ –//g' \
+                 -e 's/ / /g' \
+                 -e 's/<-//g' ${tmp_file}
+
+    # remove paragraphs, empty speaker elements, chapter elements
+    # add quotes to non-quoted ID tags
+    # FIXME: there are still empty speaker elements after this.
+    sed -i -e 's/<SPEAKER.*\/>//g' \
+                 -e 's/<\/*P.*>//g' \
+                 -e '/<CHAPTER/{ :f; s/<CHAPTER.*\(<SPEAKER\)/\1/; t; N; bf; }' ${tmp_file}
+    sed -i '1i\
 ' ${tmp_file}
 
-  perl -pi -e 'print "\n" if $. == 1; undef $/; s{(<(\w+).*?>.*?)(?=\s*(<\w|\z))}{$1."\n</$2>"}esg' ${tmp_file}
+    perl -pi -e 'print "\n" if $. == 1; undef $/; s{(<(\w+).*?>.*?)(?=\s*(<\w|\z))}{$1."\n</$2>"}esg' ${tmp_file}
 
-  # remove extra quotes in name element
-  sed -i -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
-         -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
-         -e 's/\(NAME=\".*\)"\(.*\"\)/\1\2/g'        \
-         -e "s/\(NAME=\".*\)'\(.*\"\)/\1\2/g" ${tmp_file}
+    # remove extra quotes in name element
+    sed -i -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
+                 -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
+                 -e 's/\(NAME=\".*\)"\(.*\"\)/\1\2/g'                \
+                 -e "s/\(NAME=\".*\)'\(.*\"\)/\1\2/g" ${tmp_file}
 
-  sed -i -e 's/\(NAME="[^"]*\) AFFILIATION=\([^"]*\)">/\1" AFFILIATION="\2">/g' ${tmp_file}
+    sed -i -e 's/\(NAME="[^"]*\) AFFILIATION=\([^"]*\)">/\1" AFFILIATION="\2">/g' ${tmp_file}
 
-  echo "<body>" > ${xml_tmp_file}
-  echo "<filename id=\"${base_xml_filename}\" />" >> ${xml_tmp_file}
-  echo "<language id=\"${language}\" />" >> ${xml_tmp_file}
-  cat ${tmp_file} >> ${xml_tmp_file}
-  echo "</body>" >> ${xml_tmp_file}
-  echo -n ". "
+    echo "<body>" > ${xml_tmp_file}
+    echo "<filename id=\"${base_xml_filename}\" />" >> ${xml_tmp_file}
+    echo "<language id=\"${language}\" />" >> ${xml_tmp_file}
+    cat ${tmp_file} >> ${xml_tmp_file}
+    echo "</body>" >> ${xml_tmp_file}
+    echo -n ". "
 
-  xsltproc -o  ${output_dir}/${xml_filename} --novalid ${scratch_dir}/${xsl_file} ${xml_tmp_file} || exit 1 
-  # this removes any EPparty attributes that don't match the DTD
-  # if you change the DTD above or elsewhere, change it here too
-  sed -i -e 's/ EPparty="\(PPE-DE\|PSE\|ALDE\|Verts-ALE\|GUE-NGL\|IND-DEM\|UEN\|NI\|ELDR\|EDD\|EPP-DE\|PPE\|UPE\|TDI\|EFD\|ITS\|ECR\|S-D\|UNKNOWN\)"/@="\1"/g
-             s/  *EPparty="[^"]*"//g
-             s/@="/ EPparty="/g' ${output_dir}/${xml_filename}
+    xsltproc -o  ${output_dir}/${xml_filename} --novalid ${scratch_dir}/${xsl_file} ${xml_tmp_file} || exit 1
+    # this removes any EPparty attributes that don't match the DTD
+    # if you change the DTD above or elsewhere, change it here too
+    sed -i -e 's/ EPparty="\(PPE-DE\|PSE\|ALDE\|Verts-ALE\|GUE-NGL\|IND-DEM\|UEN\|NI\|ELDR\|EDD\|EPP-DE\|PPE\|UPE\|TDI\|EFD\|ITS\|ECR\|S-D\|UNKNOWN\)"/@="\1"/g
+                         s/  *EPparty="[^"]*"//g
+                         s/@="/ EPparty="/g' ${output_dir}/${xml_filename}
 
-  # remove this for now. in future, sometimes the affiliation
-  # contains the post.
+    # remove this for now. in future, sometimes the affiliation
+    # contains the post.
 #  sed -i -e 's/\(<name>.*\)AFFILIATION=.*\(<\/name>\)/\1\2/g' ${output_dir}/${xml_filename}
 
-  xmllint --noout --valid ${output_dir}/${xml_filename} && is_valid || not_valid
+    xmllint --noout --valid ${output_dir}/${xml_filename} && is_valid || not_valid
 
-  if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
-    rm ${tmp_file}
-    rm ${xml_tmp_file}
-  fi
+    if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
+        rm ${tmp_file}
+        rm ${xml_tmp_file}
+    fi
 
-  xml_filename=""
+    xml_filename=""
 
 }
 
 create_tmp_files() {
 
-  if [ ! -e ${output_dir} ] ; then
-    mkdir -p ${output_dir}
-  fi
-  pushd ${scratch_dir} > /dev/null
-  output_xslt
-  output_indent
-  popd > /dev/null
-  output_dtd
+    if [ ! -e ${output_dir} ] ; then
+        mkdir -p ${output_dir}
+    fi
+    pushd ${scratch_dir} > /dev/null
+    output_xslt
+    output_indent
+    popd > /dev/null
+    output_dtd
 }
 
 rm_tmp_files() {
 
-  if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
-    pushd ${scratch_dir} > /dev/null
-    rm $xsl_file
-    rm $indent_file 
-    popd > /dev/null
-  fi
+    if [ "$REMOVE_TMP_FILES" ==  "1" ] ; then
+        pushd ${scratch_dir} > /dev/null
+        rm $xsl_file
+        rm $indent_file
+        popd > /dev/null
+    fi
 }
 
 find_alt_langs() {
 
-  if [ "${alt_langs}" == "" ] ; then
-  # assume we are in the $current_lang directory
-    current=`basename ${PWD}`
-    alt_langs=`ls .. | grep -v ${current}`
-  fi
+    if [ "${alt_langs}" == "" ] ; then
+    # assume we are in the $current_lang directory
+        current=`basename ${PWD}`
+        alt_langs=`ls .. | grep -v ${current}`
+    fi
 
 }
 
@@ -707,82 +707,82 @@ missing_prereqs() {
 
 concat_file_parts() {
 
-  files=""
-  for i in  *.txt ; do
-    let length=$(echo ${i} | wc -c)
-    if [ $length -gt 16 ] ; then
-      base=$(basename ${i} .txt | cut -f 1-4 -d -)
-      echo ${files} | grep ${base} 2>&1 >/dev/null
-      if [ $? -ne 0 ] ; then
-        files="${files} ${base}"
-      fi
-    fi
-  done
-
-  for i in ${files} ; do
-    rm -f ${i}.txt
-    for j in ${i}*.txt ; do
-      cat ${j} >>${i}.txt
+    files=""
+    for i in    *.txt ; do
+        let length=$(echo ${i} | wc -c)
+        if [ $length -gt 16 ] ; then
+            base=$(basename ${i} .txt | cut -f 1-4 -d -)
+            echo ${files} | grep ${base} 2>&1 >/dev/null
+            if [ $? -ne 0 ] ; then
+                files="${files} ${base}"
+            fi
+        fi
     done
-  done
+
+    for i in ${files} ; do
+        rm -f ${i}.txt
+        for j in ${i}*.txt ; do
+            cat ${j} >>${i}.txt
+        done
+    done
 
 }
 
 preprocess() {
 
-  find_alt_langs
-  concat_file_parts
-  for lang in ${alt_langs} ; do
-    cd ../${lang}
+    find_alt_langs
     concat_file_parts
-  done
-  cd ../${current}
+    for lang in ${alt_langs} ; do
+        cd ../${lang}
+        concat_file_parts
+    done
+    cd ../${current}
 
 }
 
 
 convert() {
-  prereqs
-  create_tmp_dir
-  create_tmp_files
-  find_alt_langs
-  if [ "${parse_all}" == "1" ] ; then
-    convert_all
-  elif [ "${convert_files}" == "1" ] ; then
-    i=${infile}
-    convert_file
-  else
-    echo "Error: no files specified for converstion."
-    usage
-  fi
-  rm_tmp_files
-  rm_tmp_dir
+    prereqs
+    create_tmp_dir
+    create_tmp_files
+    find_alt_langs
+    if [ "${parse_all}" == "1" ] ; then
+        convert_all
+    elif [ "${convert_files}" == "1" ] ; then
+        i=${infile}
+        convert_file
+    else
+        echo "Error: no files specified for converstion."
+        usage
+    fi
+    rm_tmp_files
+    rm_tmp_dir
 
 }
 
 parseopts() {
-  while getopts "dapcf:o:" opt; do
-    case ${opt} in
-      d)
-        set -ex
-        ;;
-      a)
-        parse_all=1
-        ;;
-      c)
-        convert_files=1
-        ;;
-      f)
-        infile=$OPTARG
-        ;;
-      o)
-        xml_filename=$OPTARG
-        ;;
-      *)
-        usage
-        ;;
-    esac
-  done
+    while getopts "dapcf:o:" opt; do
+        case ${opt} in
+            d)
+                set -ex
+                ;;
+            a)
+                parse_all=1
+                ;;
+            c)
+                convert_files=1
+                ;;
+            f)
+                infile=$OPTARG
+                ;;
+            o)
+                xml_filename=$OPTARG
+                ;;
+            *)
+                usage
+                ;;
+        esac
+    done
 }
 
 parseopts $@
@@ -794,7 +794,7 @@ parseopts $@
 prereqs
 preprocess
 if [ "${convert_files}" == "1" ] ; then
-  convert
+    convert
 else
-  usage
+    usage
 fi
