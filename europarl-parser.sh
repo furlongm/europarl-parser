@@ -22,7 +22,6 @@
 # $ wget http://www.statmt.org/europarl/v7/europarl.tgz
 # $ tar xf europarl.tgz
 # $ cd europarl/txt/en
-# $ ../../../europarl-parser.sh -p
 # $ ../../../europarl-parser.sh -c -a
 #  or
 # $ ../../../europarl-parser.sh -c -f ep-2010-07-07.txt
@@ -94,15 +93,8 @@ function usage() {
   echo "See comments in script for futher information."
   echo
   echo "Usage:"
-  echo "$0 -p         (preprocess files, required for europarl v6)"
   echo "$0 -c -f FILE (converts a single file to ecpc_EP xml)"
   echo "$0 -c -a      (converts all files in current directory)"
-  echo
-  echo "N.B. 1"
-  echo "Preprocessing files takes some time, but will significantly increase the number"
-  echo "of files processed. Only files of the format ep-yy-mm-dd.txt will be processed,"
-  echo "and in later years, these files have been split out into a number of smaller"
-  echo "files which will not be converted unless preprocessing is run before conversion."
   echo
   echo "N.B. 2"
   echo "This script should be run in the language directory of the corpus."
@@ -781,9 +773,6 @@ function parseopts() {
       a)
         parse_all=1
         ;;
-      p)
-        preprocess_files=1
-        ;;
       c)
         convert_files=1
         ;;
@@ -806,9 +795,9 @@ parseopts $@
 #convert_files=1
 #infile=$1
 
-if [ "${preprocess_files}" == "1" ] ; then
-  preprocess
-elif [ "${convert_files}" == "1" ] ; then
+prereqs
+preprocess
+if [ "${convert_files}" == "1" ] ; then
   convert
 else
   usage
