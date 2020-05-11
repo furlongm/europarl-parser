@@ -70,13 +70,13 @@
 # User variables
 
 # set to 1 to skip files that have already been processed
-skip_existing=0
+skip_existing=1
 
 # set to 1 to rename files to e.g. EN20031222.xml
 rename_files=1
 
 # Set the default language to process
-lang=
+lang=en
 
 # Each language directory needs to be validated against a separate language,
 # because all the native language interventions will be marked as UNKNOWN.
@@ -442,7 +442,7 @@ missing_languages() {
         if [ -z ${old_lang} ] ; then
             find_new_lang
             if [ ! -z ${new_lang} ] ; then
-                second_segment=$(echo ${speaker_segment} | sed -e 's/\///g' -e 's/\*//g' -e 's/\[//g' -e 's/\]//g' | cut -f5- -d\")
+                second_segment=`echo $speaker_segment | sed -e 's/\\//\\\\\//g' -e 's/\\*//g' -e 's/\\[/\\\\[/g' -e 's/\\]/\\\\]/g'  | cut -f5- -d\"`
                 sed -i -e "s/\(${first_segment}\"\).*\(\"${second_segment}\)/\1${new_lang}\2/" ${tmp_file}
             fi
         fi
@@ -563,6 +563,7 @@ convert_file() {
 
     if [ "${skip_existing}" == "1" ] && [ -f ${output_dir}/${xml_filename} ] ; then
         echo 'Warning: output file exists, skipping.'
+        cd ${base_dir}
         return
     fi
 
@@ -620,7 +621,7 @@ convert_file() {
     sed -i -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
            -e 's/\(NAME=".*\)"\(.*\)"\(.*"\)/\1\2\3/g' \
            -e 's/\(NAME=\".*\)"\(.*\"\)/\1\2/g'        \
-           -e "s/\(NAME=\".*\)'\(.*\"\)/\1\2/g" #FIXME \
+           -e "s/\(NAME=\".*\)'\(.*\"\)/\1\2/g"        \
            ${tmp_file}
 
     sed -i -e 's/\(NAME="[^"]*\) AFFILIATION=\([^"]*\)">/\1" AFFILIATION="\2">/g' ${tmp_file}
