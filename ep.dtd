@@ -1,0 +1,47 @@
+<!-- ep.dtd: EC Parliament sessions. : 1.7 $ -->
+<!ELEMENT ecpc_EP (header,body,back)>
+<!ELEMENT header (title|index|omit)*>
+<!ATTLIST header filename CDATA #REQUIRED>
+<!ATTLIST header language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV) #REQUIRED>
+<!ELEMENT title (#PCDATA)>
+<!-- indexitem tags different items within the index. These will be repeated later on throughout the text as header to separate different items in the session -->
+<!ELEMENT index (#PCDATA|label|date|place|edition|indexitem)*>
+<!-- WHY CAN'T WE USE * NEXT TO INDEXITEM AND IN THE BRACKETS -->
+<!ELEMENT label (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT place (#PCDATA)>
+<!ELEMENT edition (#PCDATA)>
+<!ELEMENT indexitem (#PCDATA)>
+<!ATTLIST indexitem number CDATA #REQUIRED>
+<!--All elements which are to part of speech and will be consequently omitted in our study will be labelled no speech when they appear outside the speech -->
+<!ELEMENT omit (#PCDATA)>
+<!--WE could add attributes to these list if we find more nospeech items -->
+<!ATTLIST omit desc (opening|action|reaction|procedure|note|closing) #IMPLIED>
+<!--Chair tags the person presiding the session over; opening is the time in which the session is opened; intervention contains information about speakers plus speeches; headings are the indexitems which now separate parts of the session; nospeech are items that are not part of the speech -->
+<!ELEMENT body (#PCDATA|chair|intervention|heading|omit|italics)*>
+<!ELEMENT chair (#PCDATA|omit)*>
+<!--<!ELEMENT intervention (speaker|speech|writer|writing|omit|italics)*>-->
+<!ELEMENT intervention (omit*,(speaker|writer),omit*,(speech|writing)+,omit*)>
+<!ATTLIST intervention ref CDATA #IMPLIED>
+<!ELEMENT speaker (name*,affiliation?,post?)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT affiliation EMPTY>
+<!ATTLIST affiliation
+EPparty (PPE-DE|PSE|ALDE|Verts-ALE|GUE-NGL|IND-DEM|UEN|NI|ELDR|EDD|EPP-ED|PPE|UPE|TDI|I-EDN|ARE|EFD|ITS|ECR|S-D|UNKNOWN) "UNKNOWN"
+national_party CDATA #IMPLIED>
+<!ELEMENT post (#PCDATA)>
+<!ELEMENT speech (#PCDATA|omit|italics)*>
+<!ATTLIST speech language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV|UNKNOWN)
+"UNKNOWN">
+<!ATTLIST speech ref ID #REQUIRED>
+<!ELEMENT writer (name*,affiliation?,post?)>
+<!ELEMENT writing (#PCDATA|omit|italics)*>
+<!ATTLIST writing ref ID #REQUIRED>
+<!ATTLIST writing language (BG|CS|DA|DE|EL|EN|ES|ET|FI|FR|GA|HU|IT|LT|LV|MT|NL|PL|PT|RO|SK|SL|SV|UNKNOWN)
+"UNKNOWN">
+<!ELEMENT italics (#PCDATA)>
+<!ELEMENT heading (#PCDATA)>
+<!ATTLIST heading number CDATA #REQUIRED>
+<!ELEMENT back (update|disclaimer|omit)*>
+<!ELEMENT update (#PCDATA)>
+<!ELEMENT disclaimer (#PCDATA)>
