@@ -1,5 +1,6 @@
 # Usage
 
+```shell
 $ wget http://www.statmt.org/europarl/v7/europarl.tgz
 $ tar xf europarl.tgz
 $ git clone https://github.com/furlongm/europarl-parser
@@ -9,6 +10,7 @@ $ ./europarl-parser.sh -c
 $ ./europarl-parser.sh -c -f txt/en/ep-2010-07-07.txt
  or
 $ ./europarl-parser.sh -c -l es
+```
 
 Processed files will end up in europarl/txt/lang/processed
 
